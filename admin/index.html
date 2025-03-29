@@ -1,0 +1,40 @@
+---
+layout: default
+---
+
+    <h1>Tambah Postingan Baru</h1>
+    <label>Nama File (tanpa .md):</label>
+    <input type="text" id="filename" placeholder="contoh: nama-produk">
+    
+    <label>Isi Markdown:</label>
+    <textarea id="markdown-content" rows="10" cols="50"></textarea>
+    
+    <button onclick="uploadMarkdown()">Upload</button>
+    
+    <script type="module">
+        const firebaseConfig = {
+        apiKey: "{{site.apiKey}}",
+        authDomain: "{{site.authDomain}}",
+        databaseURL: "{{site.databaseURL}}",
+        projectId: "{{site.projectId}}",
+        storageBucket: "{{site.storageBucket}}",
+        messagingSenderId: "{{site.senderId}}",
+        appId: "{{site.appId}}"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
+        async function uploadMarkdown() {
+            const filename = document.getElementById("filename").value;
+            const content = document.getElementById("markdown-content").value;
+            
+            if (!filename || !content) {
+                alert("Nama file dan isi markdown tidak boleh kosong!");
+                return;
+            }
+
+            const fileRef = storage.ref(`posts/${filename}.md`);
+            await fileRef.putString(content);
+            alert("File Markdown berhasil diunggah!");
+        }
+    </script>
