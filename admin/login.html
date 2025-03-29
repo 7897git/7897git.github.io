@@ -17,32 +17,43 @@ permalink: /admin
     <button onclick="login()">Login</button>
     <p id="error-message" style="color: red;"></p>
 
-{% include sdk.html %}
-  
     <script type="module">
+        // Pastikan Firebase SDK telah dimuat
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+
+        // Konfigurasi Firebase
         const firebaseConfig = {
-        apiKey: "{{site.apiKey}}",
-        authDomain: "{{site.authDomain}}",
-        databaseURL: "{{site.databaseURL}}",
-        projectId: "{{site.projectId}}",
-        storageBucket: "{{site.storageBucket}}",
-        messagingSenderId: "{{site.SenderId}}",
-        appId: "{{site.appId}}"
+            apiKey: "{{site.apiKey}}",
+            authDomain: "{{site.authDomain}}",
+            databaseURL: "{{site.databaseURL}}",
+            projectId: "{{site.projectId}}",
+            storageBucket: "{{site.storageBucket}}",
+            messagingSenderId: "{{site.messagingSenderId}}",  // Diperbaiki
+            appId: "{{site.appId}}"
         };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
 
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Fungsi Login
         function login() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
 
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
+            if (!email || !password) {
+                document.getElementById("error-message").innerText = "Email dan password harus diisi!";
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
                     localStorage.setItem("adminLoggedIn", "true");
                     window.location.href = "{{site.baseurl}}/dashboard";
                 })
                 .catch((error) => {
-                    document.getElementById("error-message").innerText = error.message;
+                    document.getElementById("error-message").innerText = "Login gagal: " + error.message;
                 });
         }
     </script>
