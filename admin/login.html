@@ -20,7 +20,15 @@ permalink: /admin
 {% include sdk.html %}
   
     <script type="module">
-        const firebaseConfig = { /* Firebase Config */ };
+        const firebaseConfig = {
+        apiKey: "{{site.apiKey}}",
+        authDomain: "{{site.authDomain}}",
+        databaseURL: "{{site.databaseURL}}",
+        projectId: "{{site.projectId}}",
+        storageBucket: "{{site.storageBucket}}",
+        messagingSenderId: "{{site.SenderId}}",
+        appId: "{{site.appId}}"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
