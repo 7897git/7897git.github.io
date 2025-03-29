@@ -1,6 +1,6 @@
 ---
 layout: none
-permalink: /login
+permalink: /admin
 ---
 
 <!DOCTYPE html>
@@ -31,7 +31,7 @@ permalink: /login
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     localStorage.setItem("adminLoggedIn", "true");
-                    window.location.href = "admin.html";
+                    window.location.href = "{{site.baseurl}}/dashboard";
                 })
                 .catch((error) => {
                     document.getElementById("error-message").innerText = error.message;
