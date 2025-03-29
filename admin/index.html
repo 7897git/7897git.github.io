@@ -43,7 +43,7 @@ permalink: /dashboard
 
     auth.onAuthStateChanged((user) => {
         if (!user || localStorage.getItem("adminLoggedIn") !== "true") {
-            window.location.href = "{{site.baseurl}}/dashboard";
+            window.location.href = "{{site.baseurl}}/admin";
         }
     });
 
