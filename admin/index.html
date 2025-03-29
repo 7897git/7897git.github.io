@@ -38,4 +38,21 @@ permalink: /dashboard
             await fileRef.putString(content);
             alert("File Markdown berhasil diunggah!");
         }
-    </script>
+        
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged((user) => {
+        if (!user || localStorage.getItem("adminLoggedIn") !== "true") {
+            window.location.href = "{{site.baseurl}}/dashboard";
+        }
+    });
+
+    function logout() {
+        auth.signOut().then(() => {
+            localStorage.removeItem("adminLoggedIn");
+            window.location.href = "{{site.baseurl}}/admin";
+        });
+    }
+</script>
+
+<button onclick="logout()">Logout</button>
