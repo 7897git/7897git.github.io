@@ -2,4 +2,31 @@
 layout: default
 ---
 
-<h1>Hello world!</h1>
+<div id="markdown-content">Memuat...</div>
+
+<script>
+  const firebaseConfig = { /* Firebase Config */ };
+  firebase.initializeApp(firebaseConfig);
+  const storage = firebase.storage();
+
+  async function loadMarkdown(slug) {
+      const fileRef = storage.ref(`posts/${slug}.md`);
+      fileRef.getDownloadURL().then(async (url) => {
+          const response = await fetch(url);
+          const content = await response.text();
+          document.getElementById("markdown-content").innerHTML = marked.parse(content);
+      }).catch(error => {
+          document.getElementById("markdown-content").innerHTML = "File tidak ditemukan.";
+      });
+  }
+
+  // Ambil slug dari URL (misalnya domain.com/post.html?slug=nama-produk-1)
+  const urlParams = new URLSearchParams(window.location.search);
+  const slug = urlParams.get("slug");
+
+  if (slug) {
+      loadMarkdown(slug);
+  } else {
+      document.getElementById("markdown-content").innerHTML = "Slug tidak ditemukan.";
+  }
+</script>
