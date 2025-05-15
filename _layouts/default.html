@@ -4,18 +4,14 @@
   {% include head.html %}
 
   <body>
-
-<!-- Always shows a header, even in smaller screens. -->
-<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-  {% include mdl-header.html %}
-  {% include mdl-drawer.html %}
-  <main class="mdl-layout__content">
-    <div class="page-content">
-      {{ content }}
+  <body>
+    {% include sidebar.html %}
+    <div class="main-content">
+      {% include header.html %}
+      <main>
+        {{ content }}
+      </main>
     </div>
-  </main>
-</div>
-
   </body>
 
 </html>
