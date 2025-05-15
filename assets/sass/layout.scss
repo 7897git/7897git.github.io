@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background: $sidebar-bg;
+  color: $text-light;
+  padding: 1rem;
+  position: fixed;
+  height: 100vh;
+
+  nav a {
+    display: block;
+    color: $text-light;
+    margin: 0.5rem 0;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.main-content {
+  margin-left: 220px;
+  width: 100%;
+  padding: 1rem;
+}
+
+.header {
+  background: #f8f9fc;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+}
