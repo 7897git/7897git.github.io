@@ -12,16 +12,66 @@ body {
   padding: 1rem;
   position: fixed;
   height: 100vh;
+  transition: all 0.3s ease;
+  z-index: 1000;
 
-  nav a {
-    display: block;
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sidebar-toggle {
+    background: none;
+    border: none;
     color: $text-light;
-    margin: 0.5rem 0;
-    text-decoration: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: none;
+  }
 
-    &:hover {
-      text-decoration: underline;
+  .sidebar-nav {
+    margin-top: 1rem;
+
+    a {
+      display: block;
+      color: $text-light;
+      margin: 0.5rem 0;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
+  }
+
+  &.collapsed {
+    height: auto;
+    .sidebar-nav {
+      display: none;
+    }
+  }
+}
+
+.main-content {
+  margin-left: 220px;
+  width: 100%;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: relative;
+
+    .sidebar-toggle {
+      display: block;
+    }
+  }
+
+  .main-content {
+    margin-left: 0;
   }
 }
 
@@ -61,38 +111,4 @@ body {
   color: #fff;
   padding: 1rem;
   border-radius: 8px;
-}
-.sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.sidebar-toggle {
-  background: none;
-  border: none;
-  color: $text-light;
-  font-size: 1.5rem;
-  cursor: pointer;
-  display: none;
-}
-
-/* Collapse style */
-.sidebar.collapsed nav {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 100%;
-    height: auto;
-  }
-
-  .sidebar-toggle {
-    display: block;
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
 }
