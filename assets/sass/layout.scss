@@ -50,3 +50,15 @@ body {
     margin-left: 0;
   }
 }
+.cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.card {
+  background: $primary;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+}
