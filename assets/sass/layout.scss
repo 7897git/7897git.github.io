@@ -62,3 +62,37 @@ body {
   padding: 1rem;
   border-radius: 8px;
 }
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: $text-light;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: none;
+}
+
+/* Collapse style */
+.sidebar.collapsed nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
+
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+}
