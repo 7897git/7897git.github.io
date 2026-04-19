@@ -2,53 +2,90 @@
 layout: default
 ---
 
+<div id="posts-container">
   {% for item in site.posts %}
-	<ion-card class="border-card">
-<ion-grid v-for="(item, index) in data" style="padding:0;">
-			<ion-row class="first-row">
-				<div class="company">
-					{{ item.title }}
-					<br />
-					<span class="model">
-						{{ item.actor }}
-					</span>
-				</div>
-                <div class="img-linear"></div>
-				<div class="img" style="background-image:url({{item.cover1}})" ></div>
-			</ion-row>
-			<ion-row class="second-row">
-				<ion-col>
-					<div class="label">MIDB Rate</div>
-					<div class="value">
-					<ion-icon color="warning" name="star"></ion-icon> {{ item.midb }}
-						<span class="unit">
-							/10
-						</span>
-					</div>
-				</ion-col>
-				<ion-col>
-					<div class="label">Durasi</div>
-					<div class="value">
-						{{ item.dur }} 
-						<span class="unit">
-							
-						</span>
-					</div>
-				</ion-col>
-				<ion-col>
-					<div class="label">Resolusi</div>
-					<div class="value">
-						{{ item.res }}
-					</div>
-				</ion-col>
-				<ion-list lines="none" style="background-color:white;float:right">
-                    <ion-buttons slot="end">
-                        <ion-button onclick="pageVideo{{forloop.index}}()">
-                            <ion-icon color="success" slot="icon-only" name="play-circle"></ion-icon>
-                        </ion-button>
-                    </ion-buttons>
-				</ion-list>
-			</ion-row>
-		</ion-grid>
-	</ion-card>
+    <ion-card class="border-card post-card" data-index="{{ forloop.index0 }}">
+      <ion-grid style="padding:0;">
+        <ion-row class="first-row">
+          <div class="company">
+            {{ item.title }}
+            <br />
+            <span class="model">{{ item.actor }}</span>
+          </div>
+          <div class="img-linear"></div>
+          <div class="img" style="background-image:url({{item.cover1}})"></div>
+        </ion-row>
+        <ion-row class="second-row">
+          <ion-col>
+            <div class="label">MIDB Rate</div>
+            <div class="value">
+              <ion-icon color="warning" name="star"></ion-icon> {{ item.midb }}
+              <span class="unit">/10</span>
+            </div>
+          </ion-col>
+          <ion-col>
+            <div class="label">Durasi</div>
+            <div class="value">{{ item.dur }}</div>
+          </ion-col>
+          <ion-col>
+            <div class="label">Resolusi</div>
+            <div class="value">{{ item.res }}</div>
+          </ion-col>
+          <ion-list lines="none" style="background-color:white;float:right">
+            <ion-buttons slot="end">
+              <ion-button onclick="pageVideo{{forloop.index}}()">
+                <ion-icon color="success" slot="icon-only" name="play-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-list>
+        </ion-row>
+      </ion-grid>
+    </ion-card>
   {% endfor %}
+</div>
+
+<!-- Tombol Load More -->
+<div style="text-align: center; margin: 20px;">
+  <ion-button id="load-more-btn" expand="block" fill="outline">
+    <ion-icon slot="start" name="refresh-outline"></ion-icon>
+    Load More
+  </ion-button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.post-card');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    let itemsToShow = 6;      // jumlah awal yang ditampilkan
+    let currentIndex = itemsToShow;
+    
+    // Sembunyikan semua kartu yang melebihi itemsToShow
+    function hideAllBeyond(index) {
+      for (let i = 0; i < cards.length; i++) {
+        if (i < index) {
+          cards[i].style.display = '';
+        } else {
+          cards[i].style.display = 'none';
+        }
+      }
+    }
+    
+    // Tampilkan itemsToShow pertama
+    hideAllBeyond(itemsToShow);
+    
+    // Event tombol Load More
+    loadMoreBtn.addEventListener('click', function() {
+      let nextBatch = currentIndex + 6;  // muat 6 kartu berikutnya
+      if (nextBatch >= cards.length) {
+        nextBatch = cards.length;
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.style.opacity = '0.5';
+      }
+      // Tampilkan kartu dari currentIndex sampai nextBatch-1
+      for (let i = currentIndex; i < nextBatch; i++) {
+        cards[i].style.display = '';
+      }
+      currentIndex = nextBatch;
+    });
+  });
+</script>
