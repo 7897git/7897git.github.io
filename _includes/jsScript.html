@@ -2,7 +2,7 @@
             {% for item in site.posts %}
 <script>
 function pageVideo{{forloop.index}}(){location.replace("{{site.baseurl}}{{item.url}}")}
-function backHome(){location.replace("{{site.baseurl}}/")}
+function backHome(){location.replace("{{site.baseurl}}/home")}
 </script>
             {% endfor %}
             {% if page.url contains '/nonton/' %}
