@@ -70,11 +70,14 @@
     </ion-toolbar>
   </ion-header>
   
-  <ion-content class="ion-padding" style="--padding-bottom: 80px;" id="comments-container">
-      <!-- komentar akan dimuat di sini -->
+  <ion-content class="ion-padding" style="--padding-bottom: 100px;">
+    <!-- Tempat komentar -->
+    <div id="comments-container" style="min-height: 200px;">
+      <p style="text-align:center;">Memuat komentar...</p>
+    </div>
   </ion-content>
 
-  <!-- Area form komentar (fixed di bawah) -->
+  <!-- Form fixed di bawah -->
   <div style="position: sticky; bottom: 0; background: var(--ion-background-color, #fff); border-top: 1px solid #ccc; padding: 12px; z-index: 10;">
     <div id="comment-form" style="display: none;">
       <ion-item>
@@ -87,8 +90,8 @@
     </div>
   </div>
 </ion-modal>
-    </ion-app>
-<script type="module">
+      
+      <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -112,57 +115,72 @@
   const filmTitle = slug.replace(/-/g, ' ');
 
   let currentUser = null;
-  let modal = document.getElementById('commentModal');
+  const modal = document.getElementById('commentModal');
 
-  // Fungsi render komentar
   async function loadComments() {
-    const container = document.getElementById("comments-container");
-    if (!container) return;
-    
-    const commentsRef = collection(db, "comments");
-    const q = query(commentsRef, where("filmSlug", "==", slug), orderBy("timestamp", "asc"));
-    const snapshot = await getDocs(q);
-    
-    container.innerHTML = "";
-    if (snapshot.empty) {
-      container.innerHTML = "<p style='text-align:center;'>Belum ada komentar. Jadilah yang pertama!</p>";
+    const container = document.getElementById('comments-container');
+    if (!container) {
+      console.error("ERROR: Element #comments-container tidak ditemukan!");
       return;
     }
     
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      const commentDiv = document.createElement("div");
-      commentDiv.style.borderBottom = "1px solid #ccc";
-      commentDiv.style.marginBottom = "12px";
-      commentDiv.style.paddingBottom = "8px";
-      commentDiv.innerHTML = `
-        <div style="display:flex; align-items:center; gap:8px;">
-          <img src="${data.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'}" style="width:32px; height:32px; border-radius:50%;">
-          <strong>${escapeHtml(data.displayName)}</strong>
-          <small>${new Date(data.timestamp?.toDate()).toLocaleString()}</small>
-          ${currentUser && currentUser.uid === data.userId ? `<ion-button fill="clear" size="small" data-id="${docSnap.id}" class="delete-comment" style="margin-left:auto;">🗑️</ion-button>` : ''}
-        </div>
-        <p style="margin-top:8px;">${escapeHtml(data.text)}</p>
-      `;
-      container.appendChild(commentDiv);
-    });
-
-    // Event hapus komentar
-    document.querySelectorAll('.delete-comment').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const id = btn.getAttribute('data-id');
-        if (confirm("Hapus komentar ini?")) {
-          await deleteDoc(doc(db, "comments", id));
-          loadComments();
-        }
+    console.log("Loading comments for slug:", slug);
+    container.innerHTML = "<p style='text-align:center;'>⏳ Memuat komentar...</p>";
+    
+    try {
+      const commentsRef = collection(db, "comments");
+      const q = query(commentsRef, where("filmSlug", "==", slug), orderBy("timestamp", "asc"));
+      const snapshot = await getDocs(q);
+      
+      if (snapshot.empty) {
+        container.innerHTML = "<p style='text-align:center;'>💬 Belum ada komentar. Jadilah yang pertama!</p>";
+        return;
+      }
+      
+      container.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const commentDiv = document.createElement("div");
+        commentDiv.style.borderBottom = "1px solid #ccc";
+        commentDiv.style.marginBottom = "12px";
+        commentDiv.style.paddingBottom = "8px";
+        commentDiv.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="${data.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'}" style="width:32px; height:32px; border-radius:50%;">
+            <strong>${escapeHtml(data.displayName)}</strong>
+            <small>${new Date(data.timestamp?.toDate()).toLocaleString()}</small>
+            ${currentUser && currentUser.uid === data.userId ? `<ion-button fill="clear" size="small" data-id="${docSnap.id}" class="delete-comment" style="margin-left:auto;">🗑️</ion-button>` : ''}
+          </div>
+          <p style="margin-top:8px;">${escapeHtml(data.text)}</p>
+        `;
+        container.appendChild(commentDiv);
       });
-    });
+      
+      // Event hapus komentar
+      document.querySelectorAll('.delete-comment').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = btn.getAttribute('data-id');
+          if (confirm("Hapus komentar ini?")) {
+            await deleteDoc(doc(db, "comments", id));
+            loadComments();
+          }
+        });
+      });
+    } catch (err) {
+      console.error("Error loading comments:", err);
+      container.innerHTML = "<p style='text-align:center;color:red;'>Gagal memuat komentar. Periksa koneksi atau izin database.</p>";
+    }
   }
 
-  // Kirim komentar
   async function submitComment(text) {
-    if (!text.trim()) return alert("Komentar tidak boleh kosong.");
-    if (!currentUser) return alert("Login dulu untuk berkomentar.");
+    if (!text.trim()) {
+      alert("Komentar tidak boleh kosong.");
+      return;
+    }
+    if (!currentUser) {
+      alert("Login dulu untuk berkomentar.");
+      return;
+    }
     try {
       await addDoc(collection(db, "comments"), {
         filmSlug: slug,
@@ -176,25 +194,23 @@
       document.getElementById("commentText").value = "";
       loadComments();
     } catch (err) {
-      console.error(err);
+      console.error("Error submitting comment:", err);
       alert("Gagal kirim komentar: " + err.message);
     }
   }
 
-  // UI form komentar berdasarkan login
   function updateCommentUI(user) {
     const formDiv = document.getElementById("comment-form");
     const loginPrompt = document.getElementById("login-prompt");
     if (user) {
-      formDiv.style.display = "block";
-      loginPrompt.style.display = "none";
+      if (formDiv) formDiv.style.display = "block";
+      if (loginPrompt) loginPrompt.style.display = "none";
     } else {
-      formDiv.style.display = "none";
-      loginPrompt.style.display = "block";
+      if (formDiv) formDiv.style.display = "none";
+      if (loginPrompt) loginPrompt.style.display = "block";
     }
   }
 
-  // Helper escape HTML
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -205,32 +221,42 @@
     });
   }
 
-  // Tombol submit
-  document.getElementById("submitCommentBtn")?.addEventListener("click", () => {
-    const text = document.getElementById("commentText").value;
-    submitComment(text);
-  });
-
-  // Fungsi dismiss modal (global)
   window.dismissModal = () => {
     if (modal) modal.dismiss();
   };
 
-  // Ketika modal dibuka, load komentar
-  if (modal) {
-    modal.addEventListener('ionModalDidPresent', () => {
-      loadComments();
+  // Tombol submit
+  const submitBtn = document.getElementById("submitCommentBtn");
+  if (submitBtn) {
+    submitBtn.addEventListener("click", () => {
+      const textInput = document.getElementById("commentText");
+      if (textInput) submitComment(textInput.value);
     });
   }
 
-  // Auth state
+  // Saat modal dibuka, load komentar
+  if (modal) {
+    modal.addEventListener('ionModalDidPresent', () => {
+      console.log("Modal opened, loading comments...");
+      loadComments();
+    });
+  } else {
+    console.error("Modal dengan ID #commentModal tidak ditemukan di DOM.");
+  }
+
+  // Auth state change
   onAuthStateChanged(auth, (user) => {
     currentUser = user;
     updateCommentUI(user);
-    loadComments(); // refresh saat login/logout
+    // Jika modal sedang terbuka, refresh komentar
+    if (modal && modal.present && modal.present()) {
+      loadComments();
+    }
   });
 </script>
 
+    </ion-app>
+  
     {% include analytics.html %}
     {% include jsScript.html %}
     {% include firebase-auth.html %}
