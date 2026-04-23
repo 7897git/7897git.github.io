@@ -58,73 +58,80 @@
       <ion-content fullscreen>
       {{ content }}
       </ion-content>
-<ion-modal trigger="trigger-chat" id="menuChat">
-<ion-modal-header collapse="fade" translucent="true">
-        <ion-toolbar>
-<ion-title>Komentar</ion-title>
-    <ion-buttons slot="end">
-      <ion-button onClick="dismissMe()">
-        <ion-icon color="danger" slot="icon-only" name="close"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-        </ion-toolbar>
-     </ion-modal-header>
-    <ion-content class="ion-padding">
- <div id="comments-container">
-        <!-- Daftar komentar akan dimuat di sini -->
-      </div>
-      <!-- Form komentar (hanya muncul jika login) -->
-      <div id="comment-form" style="margin-top: 20px; display: none;">
-        <ion-item>
-          <ion-textarea id="commentText" placeholder="Tulis komentar Anda..." rows="3"></ion-textarea>
-        </ion-item>
-        <ion-button expand="block" id="submitCommentBtn">Kirim Komentar</ion-button>
-      </div>
-      <div id="login-prompt" style="text-align: center; margin-top: 20px; display: none;">
-        <p>🔐 <a href="/">Login dengan Google</a> untuk berkomentar.</p>
-      </div>
+<ion-modal trigger="trigger-chat" id="commentModal">
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>💬 Komentar</ion-title>
+      <ion-buttons slot="end">
+        <ion-button onclick="dismissModal()">
+          <ion-icon color="danger" slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="ion-padding" style="--padding-bottom: 80px;">
+    <!-- Tempat daftar komentar -->
+    <div id="comments-container">
+      <!-- komentar akan dimuat di sini -->
+    </div>
+  </ion-content>
 
-</ion-content>
-  </ion-modal>
+  <!-- Area form komentar (fixed di bawah) -->
+  <div style="position: sticky; bottom: 0; background: var(--ion-background-color, #fff); border-top: 1px solid #ccc; padding: 12px; z-index: 10;">
+    <div id="comment-form" style="display: none;">
+      <ion-item>
+        <ion-textarea id="commentText" placeholder="Tulis komentar Anda..." rows="2"></ion-textarea>
+      </ion-item>
+      <ion-button expand="block" id="submitCommentBtn">Kirim Komentar</ion-button>
+    </div>
+    <div id="login-prompt" style="text-align: center; display: none;">
+      <p>🔐 <a href="/">Login dengan Google</a> untuk berkomentar.</p>
+    </div>
+  </div>
+</ion-modal>
     </ion-app>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB7VKD8Y6NKcXLHAk89jpG9evCA6eXk5Hk",
-  authDomain: "dafftube-xxx.firebaseapp.com",
-  projectId: "dafftube-xxx",
-  storageBucket: "dafftube-xxx.firebasestorage.app",
-  databaseURL: "https://dafftube-xxx-default-rtdb.asia-southeast2.firebasedatabase.app",
-  messagingSenderId: "522399111487",
-  appId: "1:522399111487:web:70be78d9a11ab658295b8a",
-  measurementId: "G-48TZZE3TMS"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyB7VKD8Y6NKcXLHAk89jpG9evCA6eXk5Hk",
+    authDomain: "dafftube-xxx.firebaseapp.com",
+    projectId: "dafftube-xxx",
+    storageBucket: "dafftube-xxx.firebasestorage.app",
+    databaseURL: "https://dafftube-xxx-default-rtdb.asia-southeast2.firebasedatabase.app",
+    messagingSenderId: "522399111487",
+    appId: "1:522399111487:web:70be78d9a11ab658295b8a",
+    measurementId: "G-48TZZE3TMS"
+  };
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Ambil judul film dari URL (misal /nonton/interstellar -> interstellar)
   const slug = window.location.pathname.split('/').pop();
   const filmTitle = slug.replace(/-/g, ' ');
 
   let currentUser = null;
+  let modal = document.getElementById('commentModal');
 
   // Fungsi render komentar
   async function loadComments() {
+    const container = document.getElementById("comments-container");
+    if (!container) return;
+    
     const commentsRef = collection(db, "comments");
     const q = query(commentsRef, where("filmSlug", "==", slug), orderBy("timestamp", "asc"));
     const snapshot = await getDocs(q);
-    const container = document.getElementById("comments-container");
-    if (!container) return;
+    
     container.innerHTML = "";
     if (snapshot.empty) {
       container.innerHTML = "<p style='text-align:center;'>Belum ada komentar. Jadilah yang pertama!</p>";
       return;
     }
+    
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
       const commentDiv = document.createElement("div");
@@ -134,28 +141,28 @@ const firebaseConfig = {
       commentDiv.innerHTML = `
         <div style="display:flex; align-items:center; gap:8px;">
           <img src="${data.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'}" style="width:32px; height:32px; border-radius:50%;">
-          <strong>${data.displayName}</strong>
+          <strong>${escapeHtml(data.displayName)}</strong>
           <small>${new Date(data.timestamp?.toDate()).toLocaleString()}</small>
           ${currentUser && currentUser.uid === data.userId ? `<ion-button fill="clear" size="small" data-id="${docSnap.id}" class="delete-comment" style="margin-left:auto;">🗑️</ion-button>` : ''}
         </div>
-        <p style="margin-top:8px;">${data.text}</p>
+        <p style="margin-top:8px;">${escapeHtml(data.text)}</p>
       `;
       container.appendChild(commentDiv);
     });
 
-    // Event listener hapus komentar
+    // Event hapus komentar
     document.querySelectorAll('.delete-comment').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const id = btn.getAttribute('data-id');
         if (confirm("Hapus komentar ini?")) {
           await deleteDoc(doc(db, "comments", id));
-          loadComments(); // refresh
+          loadComments();
         }
       });
     });
   }
 
-  // Kirim komentar baru
+  // Kirim komentar
   async function submitComment(text) {
     if (!text.trim()) return alert("Komentar tidak boleh kosong.");
     if (!currentUser) return alert("Login dulu untuk berkomentar.");
@@ -177,7 +184,7 @@ const firebaseConfig = {
     }
   }
 
-  // UI untuk form komentar berdasarkan status login
+  // UI form komentar berdasarkan login
   function updateCommentUI(user) {
     const formDiv = document.getElementById("comment-form");
     const loginPrompt = document.getElementById("login-prompt");
@@ -190,29 +197,40 @@ const firebaseConfig = {
     }
   }
 
-  // Event listener modal
-  const modal = document.getElementById("commentModal");
-  function dismissModal() {
-    modal.dismiss();
+  // Helper escape HTML
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
   }
-  window.dismissModal = dismissModal;
 
-  // Submit komentar
+  // Tombol submit
   document.getElementById("submitCommentBtn")?.addEventListener("click", () => {
     const text = document.getElementById("commentText").value;
     submitComment(text);
   });
 
-  // Monitor auth state
+  // Fungsi dismiss modal (global)
+  window.dismissModal = () => {
+    if (modal) modal.dismiss();
+  };
+
+  // Ketika modal dibuka, load komentar
+  if (modal) {
+    modal.addEventListener('ionModalDidPresent', () => {
+      loadComments();
+    });
+  }
+
+  // Auth state
   onAuthStateChanged(auth, (user) => {
     currentUser = user;
     updateCommentUI(user);
-    loadComments(); // refresh komentar (juga menampilkan tombol hapus jika user pemilik)
-  });
-
-  // Load comments pertama kali ketika modal dibuka
-  modal.addEventListener("ionModalDidPresent", () => {
-    loadComments();
+    loadComments(); // refresh saat login/logout
   });
 </script>
 
