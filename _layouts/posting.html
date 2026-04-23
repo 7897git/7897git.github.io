@@ -99,7 +99,7 @@
     </ion-toolbar>
   </ion-header>
   
-  <ion-content class="ion-padding" style="--padding-bottom: 100px;">
+  <ion-content class="ion-no-padding" style="--padding-bottom: 100px;">
     <!-- Tempat komentar -->
     <div id="comments-container" style="min-height: 200px;">
       <p style="text-align:center;">Memuat komentar...</p>
@@ -173,9 +173,9 @@
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
         const commentDiv = document.createElement("div");
-        commentDiv.style.borderBottom = "1px solid #ccc";
-        commentDiv.style.marginBottom = "12px";
-        commentDiv.style.paddingBottom = "8px";
+        commentDiv.style.borderBottom = "0px solid #ccc";
+        commentDiv.style.marginBottom = "0px";
+        commentDiv.style.paddingBottom = "0px";
         commentDiv.innerHTML = `
           <ion-list inset="true">
 <ion-item detail="false">
