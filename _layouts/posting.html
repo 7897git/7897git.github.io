@@ -179,7 +179,9 @@
         commentDiv.innerHTML = `
           <ion-list inset="true">
 <ion-item detail="false">
-            <img src="${data.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'}" style="width:32px; height:32px; border-radius:50%;">
+<ion-avatar slot="start">
+            <img src="${data.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'}">
+</ion-avatar>
       <ion-label>
         <strong>${escapeHtml(data.displayName)}</strong>
         <ion-text>${escapeHtml(data.text)}</ion-text><br />
