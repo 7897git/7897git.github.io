@@ -1,0 +1,354 @@
+---
+layout: none
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MovieStream - Nonton Film</title>
+  <!-- Ionic CSS & JS -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@8/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@8/dist/ionic/ionic.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@8/css/ionic.bundle.css">
+  <!-- Firebase SDK modular -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // ========= KONFIGURASI FIREBASE (GANTI DENGAN PUNYA ANDA) =========
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ====================================================================
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+
+    // Elemen DOM
+    const tabsEl = document.querySelector('ion-tabs');
+    const loginScreen = document.getElementById('loginScreen');
+    const appContent = document.getElementById('appContent');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+
+    // Fungsi untuk mengatur visibilitas tab & login screen
+    function setAuthUI(user) {
+      const isLoggedIn = !!user;
+      loginScreen.style.display = isLoggedIn ? 'none' : 'flex';
+      appContent.style.display = isLoggedIn ? 'block' : 'none';
+      if (isLoggedIn) {
+        userAvatar.src = user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg';
+        userName.innerText = user.displayName || user.email;
+        // Jika tab belum terpilih, pilih tab home
+        const tabs = document.querySelector('ion-tabs');
+        if (tabs && window.location.hash === '#login') {
+          tabs.select('home');
+          window.location.hash = 'home';
+        }
+      } else {
+        window.location.hash = 'login';
+      }
+    }
+
+    // Login dengan Google
+    async function doGoogleLogin() {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        // sukses, UI akan update lewat observer
+      } catch (err) {
+        console.error(err);
+        alert('Gagal login: ' + err.message);
+      }
+    }
+
+    // Logout
+    async function doLogout() {
+      await signOut(auth);
+    }
+
+    // Proteksi tab: hanya izinkan akses ke tab home & nonton jika user login
+    function protectTabAccess(tabId) {
+      if (!currentUser && (tabId === 'home' || tabId === 'nonton')) {
+        document.querySelector('ion-tabs').select('login');
+        return false;
+      }
+      return true;
+    }
+
+    // Event listener untuk navigasi tab
+    function setupTabListener() {
+      const tabs = document.querySelector('ion-tabs');
+      tabs.addEventListener('ionTabWillChange', (event) => {
+        const selectedTab = event.detail.tab;
+        if (!protectTabAccess(selectedTab)) {
+          event.preventDefault();
+        }
+      });
+    }
+
+    // Render daftar film dinamis di tab 'nonton'
+    function renderMovieList() {
+      const movieContainer = document.getElementById('movieList');
+      if (!movieContainer) return;
+      // Contoh data film (bisa diambil dari Jekyll data file)
+      const movies = [
+        { id: 'interstellar', title: 'Interstellar', genre: 'Sci-Fi', poster: '🌌' },
+        { id: 'spiderverse', title: 'Spider-Verse', genre: 'Animation', poster: '🕷️' },
+        { id: 'thelastofus', title: 'The Last of Us', genre: 'Drama', poster: '🍄' },
+        { id: 'dune', title: 'Dune: Part Two', genre: 'Epic', poster: '🏜️' }
+      ];
+      movieContainer.innerHTML = movies.map(movie => `
+        <ion-card button onclick="window.location.hash='nonton/${movie.id}'">
+          <ion-card-header>
+            <ion-card-title>${movie.poster} ${movie.title}</ion-card-title>
+            <ion-card-subtitle>${movie.genre}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            Klik untuk menonton episode terbaru.
+          </ion-card-content>
+        </ion-card>
+      `).join('');
+    }
+
+    // Halaman detail nonton (protected)
+    function renderWatchPage(movieId) {
+      const contentDiv = document.getElementById('nontonContent');
+      if (!contentDiv) return;
+      let title = 'Konten Eksklusif';
+      let description = 'Anda sedang menonton film premium.';
+      if (movieId === 'interstellar') { title = 'Interstellar - 4K HDR'; description = 'Petualangan luar angkasa yang mendebarkan.'; }
+      else if (movieId === 'spiderverse') { title = 'Spider-Man: Across the Spider-Verse'; description = 'Multiverse aksi animasi.'; }
+      else if (movieId === 'thelastofus') { title = 'The Last of Us - S01E05'; description = 'Joel dan Ellie bersatu melawan infeksi.'; }
+      else if (movieId === 'dune') { title = 'Dune: Part Two'; description = 'Kolonisasi planet Arrakis.'; }
+      else { title = `Film: ${movieId}`; description = 'Streaming siap diputar.'; }
+      
+      contentDiv.innerHTML = `
+        <ion-header translucent>
+          <ion-toolbar>
+            <ion-title>${title}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button id="closeDetailBtn">Tutup</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>🎬 Sekarang Tayang</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>${description}</p>
+              <div style="background:#000; border-radius: 12px; margin-top: 16px; padding: 60px 20px; text-align:center; background-image: linear-gradient(145deg,#0f172a,#020617);">
+                🎥 SIMULASI PLAYER<br>
+                <span style="font-size:12px;">Hanya member ${currentUser?.email} yang dapat mengakses</span>
+              </div>
+              <ion-button expand="block" fill="outline" class="backToHomeBtn" style="margin-top:20px;">⬅ Kembali ke Beranda</ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      `;
+      document.getElementById('closeDetailBtn')?.addEventListener('click', () => window.location.hash = 'nonton');
+      document.querySelector('.backToHomeBtn')?.addEventListener('click', () => window.location.hash = 'home');
+    }
+
+    // Router manual: berdasarkan hash (untuk detail nonton)
+    function handleHashChange() {
+      let hash = window.location.hash.slice(1);
+      if (!currentUser && (hash === 'home' || hash.startsWith('nonton/'))) {
+        window.location.hash = 'login';
+        return;
+      }
+      const tabs = document.querySelector('ion-tabs');
+      if (hash === 'login') {
+        if (tabs) tabs.select('login');
+      } else if (hash === 'home') {
+        if (tabs) tabs.select('home');
+      } else if (hash.startsWith('nonton/')) {
+        // jika hash 'nonton/<id>' tampilkan detail, namun tetap di tab nonton dengan custom view
+        if (tabs) tabs.select('nonton');
+        const movieId = hash.split('/')[1];
+        if (movieId) renderWatchPage(movieId);
+        else renderMovieList();
+      } else if (hash === 'nonton') {
+        if (tabs) tabs.select('nonton');
+        renderMovieList();
+      } else {
+        if (tabs && currentUser) tabs.select('home');
+        else if (tabs) tabs.select('login');
+      }
+    }
+
+    // Observer auth
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      setAuthUI(user);
+      if (user) {
+        renderMovieList();
+        handleHashChange(); // refresh view sesuai hash
+      } else {
+        const tabs = document.querySelector('ion-tabs');
+        if (tabs) tabs.select('login');
+        window.location.hash = 'login';
+      }
+    });
+
+    window.addEventListener('hashchange', handleHashChange);
+    setupTabListener();
+
+    // Expose fungsi login ke global scope (untuk tombol di HTML)
+    window.doGoogleLogin = doGoogleLogin;
+    window.doLogout = doLogout;
+  </script>
+  <style>
+    /* Supaya layar login full dan app content tidak terlihat awal */
+    #loginScreen {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f172a, #1e1b4b);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    #appContent {
+      display: none;
+    }
+    ion-tab-bar {
+      --background: #0a0f1e;
+    }
+    ion-tab-button {
+      --color: #94a3b8;
+      --color-selected: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <!-- LAYAR LOGIN (muncul jika belum auth) -->
+  <div id="loginScreen">
+    <ion-card style="text-align: center; max-width: 320px; margin: auto;">
+      <ion-card-header>
+        <ion-card-title>🎬 MovieStream</ion-card-title>
+        <ion-card-subtitle>Nonton film & series eksklusif</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-button expand="block" onclick="doGoogleLogin()">
+          <ion-icon slot="start" name="logo-google"></ion-icon>
+          Login dengan Google
+        </ion-button>
+        <p style="margin-top: 16px; font-size: 12px;">Akses penuh ke semua konten setelah login.</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- KONTEN UTAMA (setelah login) dengan Ionic Tabs -->
+  <div id="appContent">
+    <ion-tabs>
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="home">
+          <ion-icon name="home"></ion-icon>
+          <ion-label>Beranda</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="nonton">
+          <ion-icon name="film"></ion-icon>
+          <ion-label>Nonton</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="profile">
+          <ion-icon name="person-circle"></ion-icon>
+          <ion-label>Profil</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+
+      <!-- Tab Home (terproteksi) -->
+      <ion-tab tab="home">
+        <ion-header translucent>
+          <ion-toolbar>
+            <ion-title>🏠 Beranda Streaming</ion-title>
+            <ion-buttons slot="end">
+              <ion-avatar style="width: 32px; height: 32px;">
+                <img id="userAvatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="avatar">
+              </ion-avatar>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Selamat datang, <span id="userName">Pengguna</span>!</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Nikmati koleksi film terbaru, series populer, dan konten orisinal hanya untuk member.</p>
+              <ion-button expand="full" onclick="doLogout()" color="danger">Logout</ion-button>
+            </ion-card-content>
+          </ion-card>
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>🔥 Trending Minggu Ini</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                <ion-item>1. Dune: Part Two</ion-item>
+                <ion-item>2. Spider-Verse 2</ion-item>
+                <ion-item>3. The Last of Us</ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ion-tab>
+
+      <!-- Tab Nonton (terproteksi) - daftar film -->
+      <ion-tab tab="nonton">
+        <ion-header translucent>
+          <ion-toolbar>
+            <ion-title>🎬 Pilih Film</ion-title>
+            <ion-buttons slot="end">
+              <ion-button id="backFromDetail" style="display: none;" onclick="window.location.hash='nonton'">Kembali</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding" id="nontonContent">
+          <!-- Konten dinamis (daftar film atau player) diisi JS -->
+          <div id="movieList">Memuat film...</div>
+        </ion-content>
+      </ion-tab>
+
+      <!-- Tab Profil (opsional) -->
+      <ion-tab tab="profile">
+        <ion-header translucent>
+          <ion-toolbar>
+            <ion-title>Profil Saya</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <ion-avatar style="width: 80px; height: 80px; margin: 20px auto;">
+            <img id="profileAvatar" src="">
+          </ion-avatar>
+          <ion-item>
+            <ion-label>Email</ion-label>
+            <ion-text id="profileEmail"></ion-text>
+          </ion-item>
+          <ion-button expand="block" onclick="doLogout()" color="dark">Keluar</ion-button>
+        </ion-content>
+      </ion-tab>
+    </ion-tabs>
+  </div>
+
+  <!-- Ionicons (optional) -->
+  <script type="module">
+    import { IonApp, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonButtons, IonAvatar, IonItem, IonList, IonText } from 'https://cdn.jsdelivr.net/npm/@ionic/core@8/dist/ionic/index.esm.js';
+    // Pastikan komponen terdaftar, namun CDN biasanya sudah otomatis. 
+    // Kode ini hanya untuk menginisialisasi, tidak wajib.
+  </script>
+</body>
+</html>
