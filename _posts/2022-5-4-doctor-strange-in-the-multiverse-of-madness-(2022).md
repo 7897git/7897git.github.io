@@ -6,7 +6,7 @@ img: https://thumb-cdn77.xnxx-cdn.com/b17d7f52-23f9-4a90-b84c-47de463c3f71/0/xn_
 cover1: https://thumb-cdn77.xnxx-cdn.com/b17d7f52-23f9-4a90-b84c-47de463c3f71/0/xn_4_p.jpg
 movie1: https://www.xnxx.com/embedframe/ueiectve582
 movie: https://www.xnxx.com/embedframe/ueiectve582
-dl: https://mp4-cdn77.xnxx-cdn.com/b17d7f52-23f9-4a90-b84c-47de463c3f71/0/video_360p.mp4?secure=I1qejAZxf3OoEDdL4tyihw==,1776968844&download=XNXX_double_penetrating_akari_asagiri_s_tight_crevices_with_a_stiff_boner_makes_for_an_outstanding_japane_SD.mp4
+dl: https://adfly.site/DoublePenetrating
 res: 720p
 color: danger
 tgl: 8 Mey 2022
