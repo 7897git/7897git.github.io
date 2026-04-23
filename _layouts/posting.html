@@ -94,16 +94,15 @@
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA3ra4E7chQhRzERyKW2aFUTRULMb10vxM",
-    authDomain: "blogdaffadev.firebaseapp.com",
-    databaseURL: "https://blogdaffadev-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "blogdaffadev",
-    storageBucket: "blogdaffadev.firebasestorage.app",
-    messagingSenderId: "489703180131",
-    appId: "1:489703180131:web:4383f5ef04c1d414ce3556",
-    measurementId: "G-ZWW4K4NVQ6"
- };
+const firebaseConfig = {
+  apiKey: "AIzaSyB7VKD8Y6NKcXLHAk89jpG9evCA6eXk5Hk",
+  authDomain: "dafftube-xxx.firebaseapp.com",
+  projectId: "dafftube-xxx",
+  storageBucket: "dafftube-xxx.firebasestorage.app",
+  messagingSenderId: "522399111487",
+  appId: "1:522399111487:web:70be78d9a11ab658295b8a",
+  measurementId: "G-48TZZE3TMS"
+};
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
