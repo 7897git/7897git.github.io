@@ -1,42 +1,317 @@
 ---
-layout: default
+layout: none
+permalink: /
 ---
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="{{ site.baseurl }}/css/styles.css">
-    <script src="{{ site.baseurl }}/js/firebase-config.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>StreamMov - Nonton Film</title>
+  <!-- Ionic Core CSS + JS -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@8/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@8/dist/ionic/ionic.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@8/css/ionic.bundle.css">
+  <!-- Firebase Modular -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+
+    // Elemen UI
+    const loginOverlay = document.getElementById('loginOverlay');
+    const mainContent = document.getElementById('mainContent');
+    const userAvatar = document.getElementById('userAvatar');
+    const userEmailSpan = document.getElementById('userEmail');
+    const userNameSpan = document.getElementById('userName');
+
+    // Proteksi tab: hanya izinkan Movies & Playlist jika user login
+    function isTabProtected(tabId) {
+      return tabId === 'movies' || tabId === 'plays';
+    }
+
+    // Fungsi untuk menampilkan/menyembunyikan overlay login
+    function setAuthUI(user) {
+      const loggedIn = !!user;
+      loginOverlay.style.display = loggedIn ? 'none' : 'flex';
+      mainContent.style.display = loggedIn ? 'block' : 'none';
+      
+      if (loggedIn) {
+        userAvatar.src = user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg';
+        userEmailSpan.innerText = user.email;
+        userNameSpan.innerText = user.displayName || user.email.split('@')[0];
+        // Jika tab yang sedang aktif adalah protected dan user login, biarkan. 
+        // Jika tidak, pilih tab pertama yang diizinkan (movies)
+        const tabs = document.querySelector('ion-tabs');
+        const currentTab = tabs?.getSelected();
+        if (currentTab && isTabProtected(currentTab)) {
+          // sudah aman
+        } else if (currentTab === 'akun' || currentTab === 'blogs') {
+          // biarkan saja
+        } else {
+          tabs?.select('movies');
+        }
+      } else {
+        // paksa tab akun atau blogs (yang tidak terproteksi) saat logout
+        const tabs = document.querySelector('ion-tabs');
+        if (tabs) tabs.select('akun');
+      }
+    }
+
+    // Login Google
+    window.doGoogleLogin = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        alert('Gagal login: ' + err.message);
+      }
+    };
+
+    // Logout
+    window.doLogout = async () => {
+      await signOut(auth);
+    };
+
+    // Event listener untuk proteksi tab sebelum pindah
+    function setupTabProtection() {
+      const tabs = document.querySelector('ion-tabs');
+      tabs.addEventListener('ionTabWillChange', (event) => {
+        const targetTab = event.detail.tab;
+        if (isTabProtected(targetTab) && !currentUser) {
+          event.preventDefault(); // batalkan pindah tab
+          // Tampilkan pesan atau paksa ke tab akun
+          loginOverlay.style.display = 'flex'; // munculkan overlay login
+          tabs.select('akun');
+          alert('Silakan login dulu untuk mengakses Movies & Playlist.');
+        }
+      });
+    }
+
+    // Render daftar film di tab movies (bisa diganti dengan data dari Jekyll)
+    function renderMovies() {
+      const container = document.getElementById('moviesContent');
+      if (!container) return;
+      const movies = [
+        { id: 'interstellar', title: 'Interstellar', genre: 'Sci-Fi', poster: '🌌' },
+        { id: 'spiderverse', title: 'Spider-Verse', genre: 'Animation', poster: '🕷️' },
+        { id: 'dune', title: 'Dune: Part Two', genre: 'Epic', poster: '🏜️' }
+      ];
+      container.innerHTML = movies.map(m => `
+        <ion-card button onclick="window.location.hash='plays/${m.id}'">
+          <ion-card-header>
+            <ion-card-title>${m.poster} ${m.title}</ion-card-title>
+            <ion-card-subtitle>${m.genre}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>Klik untuk nonton</ion-card-content>
+        </ion-card>
+      `).join('');
+    }
+
+    // Halaman nonton (detail film) di tab plays
+    function renderPlayDetail(movieId) {
+      const container = document.getElementById('playsContent');
+      if (!container) return;
+      let title = 'Film Pilihan';
+      let desc = 'Streaming eksklusif untuk member.';
+      if (movieId === 'interstellar') { title = 'Interstellar'; desc = 'Perjalanan luar angkasa.'; }
+      else if (movieId === 'spiderverse') { title = 'Spider-Verse'; desc = 'Aksi multiverse.'; }
+      else if (movieId === 'dune') { title = 'Dune: Part Two'; desc = 'Petualangan gurun pasir.'; }
+      container.innerHTML = `
+        <ion-header translucent>
+          <ion-toolbar>
+            <ion-title>${title}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button onclick="window.location.hash='plays'">Kembali</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <ion-card>
+            <ion-card-content>
+              <p>${desc}</p>
+              <div style="background:#000; padding:60px; text-align:center; border-radius:16px;">🎬 Player Simulasi</div>
+              <ion-button expand="block" fill="outline" onclick="window.location.hash='movies'">⬅ Kembali ke Movies</ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      `;
+    }
+
+    // Router untuk hash (menangani plays/xxx)
+    function handleHashChange() {
+      const hash = window.location.hash.slice(1);
+      const tabs = document.querySelector('ion-tabs');
+      if (hash.startsWith('plays/')) {
+        const movieId = hash.split('/')[1];
+        if (currentUser) {
+          tabs.select('plays');
+          renderPlayDetail(movieId);
+        } else {
+          window.location.hash = 'akun';
+          alert('Login dulu untuk menonton.');
+        }
+      } else if (hash === 'movies' || hash === 'plays' || hash === 'blogs' || hash === 'akun') {
+        if (tabs) tabs.select(hash);
+        if (hash === 'movies') renderMovies();
+        else if (hash === 'plays') renderMovies(); // tampilkan list film lagi
+      } else {
+        if (currentUser) window.location.hash = 'movies';
+        else window.location.hash = 'akun';
+      }
+    }
+
+    // Initial
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      setAuthUI(user);
+      if (user) {
+        renderMovies();
+        handleHashChange();
+      } else {
+        handleHashChange();
+      }
+    });
+    window.addEventListener('hashchange', handleHashChange);
+    setupTabProtection();
+    // Inisialisasi default
+    if (!window.location.hash) window.location.hash = 'akun';
+  </script>
+  <style>
+    #loginOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    #mainContent {
+      display: none;
+    }
+    ion-tab-bar {
+      --background: #0a0f1e;
+    }
+  </style>
 </head>
 <body>
-    <h1>Login</h1>
-    <form>
-        <!-- Firebase config goes here -->
-        <script>
-            // Firebase configuration imported from _config.yml
-            const firebaseConfig = {{ site.firebase_config | jsonify }};
-            // Initialize Firebase
-            firebase.initializeApp(firebaseConfig);
-        </script>
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-    </form>
+  <!-- LAYAR LOGIN -->
+  <div id="loginOverlay">
+    <ion-card style="max-width: 320px; text-align: center;">
+      <ion-card-header>
+        <ion-card-title>🎬 StreamMov</ion-card-title>
+        <ion-card-subtitle>Login dengan Google</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-button expand="block" onclick="doGoogleLogin()">
+          <ion-icon slot="start" name="logo-google"></ion-icon>
+          Masuk dengan Google
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
-    <nav>
-        <ul>
-            <li><a href="{{ site.baseurl }}/home.html">Home</a></li>
-            <li><a href="{{ site.baseurl }}/nonton.html">Nonton</a></li>
-            <li><a href="{{ site.baseurl }}/profile.html">Profile</a></li>
-        </ul>
-    </nav>
+  <!-- MAIN APP (setelah login) -->
+  <div id="mainContent">
+    <ion-tabs>
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="movies">
+          <ion-label>Movies</ion-label>
+          <ion-icon name="videocam"></ion-icon>
+        </ion-tab-button>
+        <ion-tab-button tab="plays">
+          <ion-label>Playlist</ion-label>
+          <ion-icon name="play"></ion-icon>
+        </ion-tab-button>
+        <ion-tab-button tab="blogs">
+          <ion-label>Blogs</ion-label>
+          <ion-icon name="terminal"></ion-icon>
+        </ion-tab-button>
+        <ion-tab-button tab="akun">
+          <ion-label>Akun</ion-label>
+          <ion-icon name="person"></ion-icon>
+        </ion-tab-button>
+      </ion-tab-bar>
 
-    <script type="module">
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        // Your login logic here
-    </script>
+      <!-- Tab Movies (protected) -->
+      <ion-tab tab="movies">
+        <ion-header translucent>
+          <ion-toolbar>
+            <ion-title>🎬 Movies</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding" id="moviesContent">
+          <!-- daftar film diisi JS -->
+        </ion-content>
+      </ion-tab>
+
+      <!-- Tab Playlist (protected) -->
+      <ion-tab tab="plays">
+        <ion-content id="playsContent">
+          <!-- konten dinamis (daftar atau player) -->
+        </ion-content>
+      </ion-tab>
+
+      <!-- Tab Blogs (boleh publik) -->
+      <ion-tab tab="blogs">
+        <ion-header translucent>
+          <ion-toolbar>
+            <ion-title>📝 Blog & Review</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Review Film Terbaru</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Artikel menarik seputar film dan series. Bisa diakses tanpa login.</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ion-tab>
+
+      <!-- Tab Akun (harus login untuk lihat profil, tapi overlay sudah handle) -->
+      <ion-tab tab="akun">
+        <ion-header translucent>
+          <ion-toolbar>
+            <ion-title>Akun Saya</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <ion-avatar style="width: 80px; height: 80px; margin: 20px auto;">
+            <img id="userAvatar" src="">
+          </ion-avatar>
+          <ion-item>
+            <ion-label>Nama</ion-label>
+            <ion-text id="userName"></ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label>Email</ion-label>
+            <ion-text id="userEmail"></ion-text>
+          </ion-item>
+          <ion-button expand="block" onclick="doLogout()" color="danger">Logout</ion-button>
+        </ion-content>
+      </ion-tab>
+    </ion-tabs>
+  </div>
 </body>
 </html>
