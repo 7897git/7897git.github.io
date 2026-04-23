@@ -30,15 +30,17 @@
 </ion-buttons>
 <div class="separator"></div>
 <ion-buttons>
-<ion-button>
-<ion-icon slot="icon-only" name="thumbs-up-outline"></ion-icon>
-</ion-button>
+  <ion-button id="likeBtn">
+    <ion-icon slot="icon-only" name="thumbs-up-outline" id="likeIcon"></ion-icon>
+    <span id="likeCount" style="margin-left: 4px; font-size: 14px;">0</span>
+  </ion-button>
 </ion-buttons>
 <div class="separator"></div>
 <ion-buttons>
-<ion-button>
-<ion-icon slot="icon-only" name="thumbs-down-outline"></ion-icon>
-</ion-button>
+  <ion-button id="dislikeBtn">
+    <ion-icon slot="icon-only" name="thumbs-down-outline" id="dislikeIcon"></ion-icon>
+    <span id="dislikeCount" style="margin-left: 4px; font-size: 14px;">0</span>
+  </ion-button>
 </ion-buttons>
 <div class="separator"></div>
 <ion-buttons>
@@ -94,7 +96,10 @@
       <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { 
+  getFirestore, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, 
+  doc, getDoc, runTransaction 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB7VKD8Y6NKcXLHAk89jpG9evCA6eXk5Hk",
@@ -199,6 +204,128 @@
     }
   }
 
+// ==================== LIKE / DISLIKE ====================
+const likeBtn = document.getElementById('likeBtn');
+const dislikeBtn = document.getElementById('dislikeBtn');
+const likeIcon = document.getElementById('likeIcon');
+const dislikeIcon = document.getElementById('dislikeIcon');
+const likeCountSpan = document.getElementById('likeCount');
+const dislikeCountSpan = document.getElementById('dislikeCount');
+
+// Load data like/dislike dari Firestore
+async function loadLikeDislike() {
+  if (!currentUser) return;
+  const docRef = doc(db, 'filmStats', slug);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    likeCountSpan.innerText = data.likes || 0;
+    dislikeCountSpan.innerText = data.dislikes || 0;
+    const userId = currentUser.uid;
+    if (data.likedBy && data.likedBy.includes(userId)) {
+      likeIcon.name = 'thumbs-up';
+    } else {
+      likeIcon.name = 'thumbs-up-outline';
+    }
+    if (data.dislikedBy && data.dislikedBy.includes(userId)) {
+      dislikeIcon.name = 'thumbs-down';
+    } else {
+      dislikeIcon.name = 'thumbs-down-outline';
+    }
+  } else {
+    likeCountSpan.innerText = '0';
+    dislikeCountSpan.innerText = '0';
+    likeIcon.name = 'thumbs-up-outline';
+    dislikeIcon.name = 'thumbs-down-outline';
+  }
+}
+
+// Like
+async function handleLike() {
+  if (!currentUser) {
+    alert('Login dulu untuk memberikan like.');
+    return;
+  }
+  const userId = currentUser.uid;
+  const docRef = doc(db, 'filmStats', slug);
+  await runTransaction(db, async (transaction) => {
+    const docSnap = await transaction.get(docRef);
+    if (!docSnap.exists()) {
+      transaction.set(docRef, {
+        likes: 1,
+        dislikes: 0,
+        likedBy: [userId],
+        dislikedBy: []
+      });
+    } else {
+      const data = docSnap.data();
+      let likes = data.likes || 0;
+      let dislikes = data.dislikes || 0;
+      let likedBy = data.likedBy || [];
+      let dislikedBy = data.dislikedBy || [];
+      if (likedBy.includes(userId)) {
+        // Batalkan like
+        likes -= 1;
+        likedBy = likedBy.filter(id => id !== userId);
+      } else {
+        // Jika sudah dislike, hapus dislike dulu
+        if (dislikedBy.includes(userId)) {
+          dislikes -= 1;
+          dislikedBy = dislikedBy.filter(id => id !== userId);
+        }
+        likes += 1;
+        likedBy.push(userId);
+      }
+      transaction.update(docRef, { likes, dislikes, likedBy, dislikedBy });
+    }
+  });
+  await loadLikeDislike();
+}
+
+// Dislike
+async function handleDislike() {
+  if (!currentUser) {
+    alert('Login dulu untuk memberikan dislike.');
+    return;
+  }
+  const userId = currentUser.uid;
+  const docRef = doc(db, 'filmStats', slug);
+  await runTransaction(db, async (transaction) => {
+    const docSnap = await transaction.get(docRef);
+    if (!docSnap.exists()) {
+      transaction.set(docRef, {
+        likes: 0,
+        dislikes: 1,
+        likedBy: [],
+        dislikedBy: [userId]
+      });
+    } else {
+      const data = docSnap.data();
+      let likes = data.likes || 0;
+      let dislikes = data.dislikes || 0;
+      let likedBy = data.likedBy || [];
+      let dislikedBy = data.dislikedBy || [];
+      if (dislikedBy.includes(userId)) {
+        dislikes -= 1;
+        dislikedBy = dislikedBy.filter(id => id !== userId);
+      } else {
+        if (likedBy.includes(userId)) {
+          likes -= 1;
+          likedBy = likedBy.filter(id => id !== userId);
+        }
+        dislikes += 1;
+        dislikedBy.push(userId);
+      }
+      transaction.update(docRef, { likes, dislikes, likedBy, dislikedBy });
+    }
+  });
+  await loadLikeDislike();
+}
+
+// Event listener
+if (likeBtn) likeBtn.addEventListener('click', handleLike);
+if (dislikeBtn) dislikeBtn.addEventListener('click', handleDislike);
+
   function updateCommentUI(user) {
     const formDiv = document.getElementById("comment-form");
     const loginPrompt = document.getElementById("login-prompt");
@@ -246,13 +373,13 @@
 
   // Auth state change
   onAuthStateChanged(auth, (user) => {
-    currentUser = user;
-    updateCommentUI(user);
-    // Jika modal sedang terbuka, refresh komentar
-    if (modal && modal.present && modal.present()) {
-      loadComments();
-    }
-  });
+  currentUser = user;
+  updateCommentUI(user);
+  loadComments();
+  loadLikeDislike();
+});
+
+if (currentUser) loadLikeDislike();
 </script>
 
     </ion-app>
