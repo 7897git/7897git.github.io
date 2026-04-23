@@ -71,11 +71,157 @@
      </ion-modal-header>
     <ion-content class="ion-padding">
 <img src="{{page.img}}" style="width:300px;display:block;margin:auto;"/>
+<br>
+ <div id="comments-container">
+        <!-- Daftar komentar akan dimuat di sini -->
+      </div>
+      <!-- Form komentar (hanya muncul jika login) -->
+      <div id="comment-form" style="margin-top: 20px; display: none;">
+        <ion-item>
+          <ion-textarea id="commentText" placeholder="Tulis komentar Anda..." rows="3"></ion-textarea>
+        </ion-item>
+        <ion-button expand="block" id="submitCommentBtn">Kirim Komentar</ion-button>
+      </div>
+      <div id="login-prompt" style="text-align: center; margin-top: 20px; display: none;">
+        <p>🔐 <a href="/">Login dengan Google</a> untuk berkomentar.</p>
+      </div>
+
 </ion-content>
   </ion-modal>
     </ion-app>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA3ra4E7chQhRzERyKW2aFUTRULMb10vxM",
+    authDomain: "blogdaffadev.firebaseapp.com",
+    databaseURL: "https://blogdaffadev-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "blogdaffadev",
+    storageBucket: "blogdaffadev.firebasestorage.app",
+    messagingSenderId: "489703180131",
+    appId: "1:489703180131:web:4383f5ef04c1d414ce3556",
+    measurementId: "G-ZWW4K4NVQ6"
+ };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Ambil judul film dari URL (misal /nonton/interstellar -> interstellar)
+  const slug = window.location.pathname.split('/').pop();
+  const filmTitle = slug.replace(/-/g, ' ');
+
+  let currentUser = null;
+
+  // Fungsi render komentar
+  async function loadComments() {
+    const commentsRef = collection(db, "comments");
+    const q = query(commentsRef, where("filmSlug", "==", slug), orderBy("timestamp", "asc"));
+    const snapshot = await getDocs(q);
+    const container = document.getElementById("comments-container");
+    if (!container) return;
+    container.innerHTML = "";
+    if (snapshot.empty) {
+      container.innerHTML = "<p style='text-align:center;'>Belum ada komentar. Jadilah yang pertama!</p>";
+      return;
+    }
+    snapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      const commentDiv = document.createElement("div");
+      commentDiv.style.borderBottom = "1px solid #ccc";
+      commentDiv.style.marginBottom = "12px";
+      commentDiv.style.paddingBottom = "8px";
+      commentDiv.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px;">
+          <img src="${data.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'}" style="width:32px; height:32px; border-radius:50%;">
+          <strong>${data.displayName}</strong>
+          <small>${new Date(data.timestamp?.toDate()).toLocaleString()}</small>
+          ${currentUser && currentUser.uid === data.userId ? `<ion-button fill="clear" size="small" data-id="${docSnap.id}" class="delete-comment" style="margin-left:auto;">🗑️</ion-button>` : ''}
+        </div>
+        <p style="margin-top:8px;">${data.text}</p>
+      `;
+      container.appendChild(commentDiv);
+    });
+
+    // Event listener hapus komentar
+    document.querySelectorAll('.delete-comment').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = btn.getAttribute('data-id');
+        if (confirm("Hapus komentar ini?")) {
+          await deleteDoc(doc(db, "comments", id));
+          loadComments(); // refresh
+        }
+      });
+    });
+  }
+
+  // Kirim komentar baru
+  async function submitComment(text) {
+    if (!text.trim()) return alert("Komentar tidak boleh kosong.");
+    if (!currentUser) return alert("Login dulu untuk berkomentar.");
+    try {
+      await addDoc(collection(db, "comments"), {
+        filmSlug: slug,
+        filmTitle: filmTitle,
+        userId: currentUser.uid,
+        displayName: currentUser.displayName,
+        photoURL: currentUser.photoURL,
+        text: text.trim(),
+        timestamp: new Date()
+      });
+      document.getElementById("commentText").value = "";
+      loadComments();
+    } catch (err) {
+      console.error(err);
+      alert("Gagal kirim komentar: " + err.message);
+    }
+  }
+
+  // UI untuk form komentar berdasarkan status login
+  function updateCommentUI(user) {
+    const formDiv = document.getElementById("comment-form");
+    const loginPrompt = document.getElementById("login-prompt");
+    if (user) {
+      formDiv.style.display = "block";
+      loginPrompt.style.display = "none";
+    } else {
+      formDiv.style.display = "none";
+      loginPrompt.style.display = "block";
+    }
+  }
+
+  // Event listener modal
+  const modal = document.getElementById("commentModal");
+  function dismissModal() {
+    modal.dismiss();
+  }
+  window.dismissModal = dismissModal;
+
+  // Submit komentar
+  document.getElementById("submitCommentBtn")?.addEventListener("click", () => {
+    const text = document.getElementById("commentText").value;
+    submitComment(text);
+  });
+
+  // Monitor auth state
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    updateCommentUI(user);
+    loadComments(); // refresh komentar (juga menampilkan tombol hapus jika user pemilik)
+  });
+
+  // Load comments pertama kali ketika modal dibuka
+  modal.addEventListener("ionModalDidPresent", () => {
+    loadComments();
+  });
+</script>
+
     {% include analytics.html %}
     {% include jsScript.html %}
     {% include firebase-auth.html %}
   </body>
 </html>
+
+
