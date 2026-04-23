@@ -6,7 +6,7 @@ img: https://thumb-cdn77.xnxx-cdn.com/4a49cada-3d6d-42a1-a274-48491b1e303b/3/xn_
 cover1: https://thumb-cdn77.xnxx-cdn.com/4a49cada-3d6d-42a1-a274-48491b1e303b/3/xn_8_p.avif
 movie1: https://www.xnxx.com/embedframe/oubvheef2d7
 movie: https://www.xnxx.com/embedframe/oubvheef2d7
-dl: https://mp4-cdn77.xnxx-cdn.com/4a49cada-3d6d-42a1-a274-48491b1e303b/3/mp4_sd.mp4?secure=HemI_bkEJ8BDTCX5hl6E_g==,1776968217&download=XNXX_akari_asagiri_s_wild_japanese_foursome_with_toys_and_dp_action_SD.mp4
+dl: https://adfly.site/WildJapanese
 res: 720p
 color: primary
 tgl: 29 Mey 2022
