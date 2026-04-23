@@ -1,20 +1,20 @@
 ---
 layout: post
-title: Doctor Strange in the Multiverse of Madness (2022)
-dur: 60M3240S
-img: https://assets.promediateknologi.com/crop/9x17:687x950/x/photo/2022/02/15/38964766.jpg
-cover1: https://dash.fembed.com/asset/userdata/404660/poster/p/6r/p6rze-im6l23zy-j.png?v=1654105328
-movie1: https://short.ink/M5_WU_B4t
-movie: https://daffa-adr.my.id/v/p6rze-im6l23zy-j
-dl: https://daffa-adr.my.id/f/p6rze-im6l23zy-j
-res: HD1080
+title: Double penetrating
+dur: 5min
+img: https://thumb-cdn77.xnxx-cdn.com/b17d7f52-23f9-4a90-b84c-47de463c3f71/0/xn_4_p.jpg
+cover1: https://thumb-cdn77.xnxx-cdn.com/b17d7f52-23f9-4a90-b84c-47de463c3f71/0/xn_4_p.jpg
+movie1: https://www.xnxx.com/embedframe/ueiectve582
+movie: https://www.xnxx.com/embedframe/ueiectve582
+dl: https://mp4-cdn77.xnxx-cdn.com/b17d7f52-23f9-4a90-b84c-47de463c3f71/0/video_360p.mp4?secure=I1qejAZxf3OoEDdL4tyihw==,1776968844&download=XNXX_double_penetrating_akari_asagiri_s_tight_crevices_with_a_stiff_boner_makes_for_an_outstanding_japane_SD.mp4
+res: 720p
 color: danger
 tgl: 8 Mey 2022
 midb: '7,3'
 tags: [2022]
-categories: [Action, Adventure, Fantasy, Horror, Sci-Fi]
+categories: [Asian, Anal, Fantasy, JAV]
 director: Sam Raimi
-actor: Benedict Cumberbatch
+actor: Akari Asagiri
 ket: Video Masih Berkualitas Rendah / (CAM)
 cast:
  - ava: https://m.media-amazon.com/images/M/MV5BOTUxNDY2OWQtZjcwOC00NmZmLThjMzAtYTNiZDNiNzYzNTQ2XkEyXkFqcGdeQXVyNjczOTE0MzM@._V1_SY100_CR69,0,100,100_AL_.jpg
@@ -34,4 +34,4 @@ cast:
    sebagai: 'Professor Charles Xavier'
 ---
 
-Doctor Strange teams up with a mysterious teenage girl from his dreams who can travel across multiverses, to battle multiple threats, including other-universe versions of himself, which threaten to wipe out millions across the multiverse. They seek help from Wanda the Scarlet Witch, Wong and others.
+Akari Asagiri, a handsome mature Asian woman, receives a rubdown but finishes up being meticulously poked in both her puss and bum by the unrelenting masseur. The youthfull stud is ecstatic to have such a stellar Asian female on his table and starts by drilling her ass before finally gruelling her with a hard boink - steaming JAV!
