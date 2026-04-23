@@ -6,7 +6,7 @@ img: https://thumb-cdn77.xnxx-cdn.com/5de9a2c8-f033-4959-8ea7-dd3588049486/0/xn_
 cover1: https://thumb-cdn77.xnxx-cdn.com/5de9a2c8-f033-4959-8ea7-dd3588049486/0/xn_1_p.jpg
 movie1: https://www.xnxx.com/embedframe/otulipfe4cd
 movie: https://www.xnxx.com/embedframe/otulipfe4cd
-dl: https://mp4-cdn77.xnxx-cdn.com/5de9a2c8-f033-4959-8ea7-dd3588049486/0/video_360p.mp4?secure=Txnrny8atZl2coGkq8CHfg==,1776967900&download=XNXX_akari_asagiri_produces_a_real_japanese_boinking_scene_-_uncensored_jav_the_handsome_and_diminutive_a_SD.mp4
+dl: https://adfly.site/RealJapanese
 res: 720p
 color: primary
 tgl: 10 Jun 2022
