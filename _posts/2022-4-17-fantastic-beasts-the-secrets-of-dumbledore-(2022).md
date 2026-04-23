@@ -6,7 +6,7 @@ img: https://thumb-cdn77.xnxx-cdn.com/6393b14f-48e4-4cf9-a684-15b7cedba521/0/xv_
 cover1: https://thumb-cdn77.xnxx-cdn.com/6393b14f-48e4-4cf9-a684-15b7cedba521/0/xv_29_t.jpg
 movie1: https://www.xnxx.com/embedframe/iuueptve6d8
 movie: https://www.xnxx.com/embedframe/iuueptve6d8
-dl: https://mp4-cdn77.xnxx-cdn.com/6393b14f-48e4-4cf9-a684-15b7cedba521/0/video_360p.mp4?secure=WXl4c2JcowngKfgM2HJTAw==,1776970310&download=XNXX_asian_ratubugil.top_SD.mp4
+dl: https://adfly.site/RatuBugil
 res: 720p
 color: primary
 tgl: 17 Apr 2022
