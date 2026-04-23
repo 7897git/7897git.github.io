@@ -1,20 +1,20 @@
 ---
 layout: post
-dur: 120M1560S
-title: Jurassic World Dominion (2022)
-img: https://sendaljepit.b-cdn.net/jurasic-world-dominion/img/jwd.jpg
-cover1: https://dash.fembed.com/asset/userdata/404660/poster/z/6-/z6-nqyijq35151mz.png?v=1655064428
-movie1: https://sendaljepit.b-cdn.net/jurasic-world-dominion/
-movie: https://daffa-adr.my.id/v/z6-nqyijq35151mz
-dl: https://daffa-adr.my.id/f/z6-nqyijq35151mz
-res: HD1080
+dur: 10min
+title:  Real Japanese boinking scene - uncensored JAV!
+img: https://thumb-cdn77.xnxx-cdn.com/5de9a2c8-f033-4959-8ea7-dd3588049486/0/xn_1_p.jpg
+cover1: https://thumb-cdn77.xnxx-cdn.com/5de9a2c8-f033-4959-8ea7-dd3588049486/0/xn_1_p.jpg
+movie1: https://www.xnxx.com/embedframe/otulipfe4cd
+movie: https://www.xnxx.com/embedframe/otulipfe4cd
+dl: https://mp4-cdn77.xnxx-cdn.com/5de9a2c8-f033-4959-8ea7-dd3588049486/0/video_360p.mp4?secure=Txnrny8atZl2coGkq8CHfg==,1776967900&download=XNXX_akari_asagiri_produces_a_real_japanese_boinking_scene_-_uncensored_jav_the_handsome_and_diminutive_a_SD.mp4
+res: 720p
 color: primary
 tgl: 10 Jun 2022
 midb: 6,0
 tags: [2022]
-categories: [Adventure, thriller, Sci-Fi]
+categories: [Asian, Japanese, JAV-UNSENSORED]
 director: Colin Trevorrow
-actor: Chris Pratt, Bryce Dallas Howard, Laura Dern
+actor: Akari Asagiri
 ket: 
 cast:
  - ava: https://m.media-amazon.com/images/M/MV5BNDU1NjU0MzA5NF5BMl5BanBnXkFtZTgwNTg5OTY2MjI@._V1_QL75_UX140_CR0,2,140,140_.jpg
@@ -28,4 +28,4 @@ cast:
    sebagai: Ellie Sattler
 ---
 
-Four years after the destruction of Isla Nublar, dinosaurs now live--and hunt--alongside humans all over the world. This fragile balance will reshape the future and determine, once and for all, whether human beings are to remain the apex predators on a planet they now share with history's most fearsome creatures in a new Era.
+The handsome and diminutive Akari Asagiri, hailing from Japan, is known for her crazy hunger for cock. In this uncensored JAV footage, she can be seen engaging in several muddy blowage gigs that will leave you erected.
