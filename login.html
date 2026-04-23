@@ -163,7 +163,7 @@ layout: none
     // Router manual: berdasarkan hash (untuk detail nonton)
     function handleHashChange() {
       let hash = window.location.hash.slice(1);
-      if (!currentUser && (hash === 'home' || hash.startsWith('nonton/'))) {
+      if (!currentUser && (hash === '/' || hash.startsWith('nonton/'))) {
         window.location.hash = 'login';
         return;
       }
