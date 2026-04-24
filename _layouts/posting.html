@@ -183,7 +183,7 @@
             <img src="${data.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'}">
 </ion-avatar>
       <ion-label>
-        <strong>${escapeHtml(data.displayName)}</strong>
+        <strong style="margin-bottom:10px;">${escapeHtml(data.displayName)}</strong>
         <ion-text>${escapeHtml(data.text)}</ion-text><br />
         <ion-note color="medium" class="ion-text-wrap">${new Date(data.timestamp?.toDate()).toLocaleString()}</ion-note>
       </ion-label>
