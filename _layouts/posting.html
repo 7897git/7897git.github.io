@@ -185,7 +185,7 @@
       <ion-label>
         <strong style="margin-bottom:10px;">${escapeHtml(data.displayName)}</strong>
         <ion-text style="margin-bottom:8px;">${escapeHtml(data.text)}</ion-text><br />
-        <ion-note color="medium" slot="end" class="ion-text-wrap" style="font-size:10px;">${new Date(data.timestamp?.toDate()).toLocaleString()}</ion-note>
+        <ion-note color="medium" class="ion-text-wrap" style="font-size:10px;">${new Date(data.timestamp?.toDate()).toLocaleString()}</ion-note>
       </ion-label>
       <div class="metadata-end-wrapper" slot="end">
 ${currentUser && currentUser.uid === data.userId ? `<ion-button fill="clear" size="small" data-id="${docSnap.id}" class="delete-comment" style="margin-left:auto;">
