@@ -157,7 +157,7 @@
     }
     
     console.log("Loading comments for slug:", slug);
-    container.innerHTML = "<p style='text-align:center;'>⏳ Memuat komentar...</p>";
+    container.innerHTML = "<p style='text-align:center;position:absolute;top:50%;left: 50%;transform:translate(-50%, -50%);''>⏳ Memuat komentar...</p>";
     
     try {
       const commentsRef = collection(db, "comments");
@@ -165,7 +165,7 @@
       const snapshot = await getDocs(q);
       
       if (snapshot.empty) {
-        container.innerHTML = "<p style='text-align:center;'>💬 Belum ada komentar. Jadilah yang pertama!</p>";
+        container.innerHTML = "<p style='text-align:center;position:absolute;top:50%;left: 50%;transform:translate(-50%, -50%);'>💬 Belum ada komentar. Jadilah yang pertama!</p>";
         return;
       }
       
