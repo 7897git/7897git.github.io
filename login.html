@@ -8,7 +8,7 @@ permalink: /
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StreamMov - LOGIN</title>
-  <!-- Ionic (opsional, bisa pakai CSS biasa) -->
+  <!-- Ionic (opsional) -->
   <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@8/dist/ionic/ionic.esm.js"></script>
   <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@8/dist/ionic/ionic.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@8/css/ionic.bundle.css">
@@ -17,15 +17,15 @@ permalink: /
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  const firebaseConfig = {
-  apiKey: "AIzaSyB7VKD8Y6NKcXLHAk89jpG9evCA6eXk5Hk",
-  authDomain: "dafftube-xxx.firebaseapp.com",
-  projectId: "dafftube-xxx",
-  storageBucket: "dafftube-xxx.firebasestorage.app",
-  messagingSenderId: "522399111487",
-  appId: "1:522399111487:web:70be78d9a11ab658295b8a",
-  measurementId: "G-48TZZE3TMS"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyB7VKD8Y6NKcXLHAk89jpG9evCA6eXk5Hk",
+      authDomain: "dafftube-xxx.firebaseapp.com",
+      projectId: "dafftube-xxx",
+      storageBucket: "dafftube-xxx.firebasestorage.app",
+      messagingSenderId: "522399111487",
+      appId: "1:522399111487:web:70be78d9a11ab658295b8a",
+      measurementId: "G-48TZZE3TMS"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -38,11 +38,25 @@ permalink: /
       }
     });
 
+    // Ambil elemen tombol dan container loading
+    const loginBtn = document.getElementById('googleLoginBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const btnTextSpan = document.getElementById('btnText');
+
     window.doGoogleLogin = async () => {
+      // Tampilkan loading, disable tombol
+      loginBtn.disabled = true;
+      loadingIndicator.style.display = 'inline-block';
+      btnTextSpan.textContent = 'Memproses...';
+
       try {
         await signInWithPopup(auth, provider);
-        // Redirect otomatis oleh onAuthStateChanged
+        // Redirect otomatis oleh onAuthStateChanged, tidak perlu reset state
       } catch (err) {
+        // Reset loading dan enable tombol jika error
+        loginBtn.disabled = false;
+        loadingIndicator.style.display = 'none';
+        btnTextSpan.textContent = 'Login dengan Google';
         alert('Login gagal: ' + err.message);
       }
     };
@@ -74,6 +88,7 @@ permalink: /
     .google-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 12px;
       background: white;
       color: #1f2937;
@@ -85,10 +100,33 @@ permalink: /
       cursor: pointer;
       transition: 0.2s;
       margin-top: 1rem;
+      min-width: 220px;
     }
-    .google-btn:hover {
+    .google-btn:hover:not(:disabled) {
       background: #f3f4f6;
       transform: scale(1.02);
+    }
+    .google-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    /* Spinner loading kecil */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    #loadingIndicator {
+      display: none;
     }
   </style>
 </head>
@@ -96,14 +134,15 @@ permalink: /
   <div class="login-card">
     <h1>🎬 StreamMov</h1>
     <p style="color: #cbd5e1;">Login untuk akses semua film</p>
-    <button class="google-btn" onclick="doGoogleLogin()">
+    <button class="google-btn" id="googleLoginBtn" onclick="doGoogleLogin()">
       <svg width="22" height="22" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
       </svg>
-      Login dengan Google
+      <span id="btnText">Login dengan Google</span>
+      <span id="loadingIndicator" class="spinner"></span>
     </button>
   </div>
 </body>
